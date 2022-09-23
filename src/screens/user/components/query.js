@@ -1,70 +1,99 @@
-import {Component} from 'react'
-import PropTypes from 'prop-types'
-import isEqual from 'lodash/isEqual'
-import * as GitHub from '../../../github-client'
+import {useContext, useEffect, useReducer, useRef} from 'react';
+import PropTypes from 'prop-types';
+import isEqual from 'lodash/isEqual';
+import * as GitHub from '../../../github-client';
 
-class Query extends Component {
-  static propTypes = {
-    query: PropTypes.string.isRequired,
-    variables: PropTypes.object,
-    children: PropTypes.func.isRequired,
-    normalize: PropTypes.func,
-  }
-  static defaultProps = {
-    normalize: data => data,
-  }
-  static contextType = GitHub.Context
+function useSetState(initialState) {
+  const [state, setState] = useReducer(
+    (state, newState) => ({...state, ...newState}),
+    initialState,
+  );
 
-  state = {loaded: false, fetching: false, data: null, error: null}
+  return [state, setState];
+}
 
-  componentDidMount() {
-    this._isMounted = true
-    this.query()
-  }
+function useSafeSetState(initialState) {
+  const [state, setState] = useSetState(initialState);
 
-  componentDidUpdate(prevProps) {
-    if (
-      !isEqual(this.props.query, prevProps.query) ||
-      !isEqual(this.props.variables, prevProps.variables)
-    ) {
-      this.query()
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    mountedRef.current = true;
+
+    // Clean-up on unmount
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  const safeSetState = (...args) => {
+    if (mountedRef.current) {
+      setState(...args);
     }
-  }
+  };
 
-  componentWillUnmount() {
-    this._isMounted = false
-  }
+  return [state, safeSetState];
+}
 
-  query() {
-    this.setState({fetching: true})
-    const client = this.context
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+
+  return ref.current;
+}
+
+function useQuery({query, variables, normalize = data => data,}) {
+  const client = useContext(GitHub.Context);
+
+  const [state, safeSetState] = useSafeSetState(
+    {
+      loaded: false,
+      fetching: false,
+      data: null,
+      error: null
+    }
+  );
+
+  useEffect(() => {
+    if (isEqual(previousInputs, [query, variables])) {
+      return;
+    }
+
+    safeSetState({fetching: true});
+
     client
-      .request(this.props.query, this.props.variables)
+      .request(query, variables)
       .then(res =>
-        this.safeSetState({
-          data: this.props.normalize(res),
+        safeSetState({
+          data: normalize(res),
           error: null,
           loaded: true,
           fetching: false,
         }),
       )
       .catch(error =>
-        this.safeSetState({
+        safeSetState({
           error,
           data: null,
           loaded: false,
           fetching: false,
         }),
-      )
-  }
+      );
+  });
 
-  safeSetState(...args) {
-    this._isMounted && this.setState(...args)
-  }
+  const previousInputs = usePrevious([query, variables]);
 
-  render() {
-    return this.props.children(this.state)
-  }
+  return state;
 }
 
-export default Query
+const Query = ({children, ...props}) => children(useQuery(props));
+
+Query.propTypes = {
+  query: PropTypes.string.isRequired,
+  variables: PropTypes.object,
+  normalize: PropTypes.func,
+};
+
+export default Query;
+export {useQuery};
