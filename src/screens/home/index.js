@@ -1,16 +1,21 @@
 /* @jsx jsx */
-import {jsx} from '@emotion/core'
-
-import {navigate} from '@reach/router'
-import {Input, PrimaryButton, IsolatedContainer} from '../../shared/pattern'
+import {jsx} from '@emotion/core';
+import {useEffect} from 'react';
+import {navigate} from '@reach/router';
+import {Input, PrimaryButton, IsolatedContainer} from '../../shared/pattern';
 
 function handleSubmit(e) {
-  e.preventDefault()
-  const username = e.target.elements.username.value.trim()
-  navigate(`/${username}`)
+  e.preventDefault();
+  const username = e.target.elements.username.value.trim();
+  navigate(`/${username}`);
 }
 
 function Home() {
+  useEffect(() => {
+    // pre-load the next page
+    import('../user');
+  }, []);
+
   return (
     <IsolatedContainer>
       <form
