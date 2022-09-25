@@ -1,25 +1,25 @@
 /* @jsx jsx */
-import {jsx} from '@emotion/core'
+import {jsx} from '@emotion/core';
 
-import {Component, useContext, useState} from 'react'
-import PropTypes from 'prop-types'
-import {Container, Row, Column} from '../../shared/layout'
+import {useContext, useState} from 'react';
+import PropTypes from 'prop-types';
+import {Container, Row, Column} from '../../shared/layout';
 import {
   Text,
   PrimaryButton,
   IsolatedContainer,
   ButtonLink,
   LoadingMessagePage,
-} from '../../shared/pattern'
-import {Context as GitHubContext} from '../../github-client'
-import {useQuery} from './components/query'
-import Profile from './components/profile'
-import RepoFilter from './components/repo-filter'
-import RepoList from './components/repo-list'
-import UserContext from './user-context'
+} from '../../shared/pattern';
+import {Context as GitHubContext} from '../../github-client';
+import {useQuery} from './components/query';
+import Profile from './components/profile';
+import RepoFilter from './components/repo-filter';
+import RepoList from './components/repo-list';
+import UserContext from './user-context';
 
 // this allows prettier to format things without changing the string contents
-const gql = String.raw
+const gql = String.raw;
 
 const userQuery = gql`
   query getUserData($username: String!) {
@@ -74,7 +74,7 @@ const userQuery = gql`
       }
     }
   }
-`
+`;
 
 function normalizeUserData(data) {
   const {
@@ -87,7 +87,7 @@ function normalizeUserData(data) {
       repositories: {totalCount: repositoriesCount, edges: reposData},
       organizations: {edges: orgsData},
     },
-  } = data
+  } = data;
   const repositories = reposData.map(r => ({
     ...r.node,
     languages: undefined,
@@ -95,8 +95,8 @@ function normalizeUserData(data) {
     language: r.node.languages.edges[0]
       ? r.node.languages.edges[0].node.name
       : 'Unknown',
-  }))
-  const organizations = orgsData.map(o => o.node)
+  }));
+  const organizations = orgsData.map(o => o.node);
   return {
     name,
     login,
@@ -106,7 +106,7 @@ function normalizeUserData(data) {
     repositoriesCount,
     repositories,
     organizations,
-  }
+  };
 }
 
 function User({ username }) {
@@ -161,7 +161,7 @@ User.propTypes = {
   username: PropTypes.string,
 };
 
-export default User
+export default User;
 
 /*
 eslint

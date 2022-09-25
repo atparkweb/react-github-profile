@@ -1,9 +1,9 @@
 /* @jsx jsx */
-import {jsx} from '@emotion/core'
+import {jsx} from '@emotion/core';
 
-import PropTypes from 'prop-types'
-import {Section, Text, Image} from '../../../shared/pattern'
-import UserContext from '../user-context'
+import PropTypes from 'prop-types';
+import {Section, Text, Image} from '../../../shared/pattern';
+import UserContext from '../user-context';
 
 function Profile({user}) {
   return (
@@ -24,7 +24,7 @@ function Profile({user}) {
         <OrganizationsSection orgs={user.organizations} />
       ) : null}
     </div>
-  )
+  );
 }
 
 Profile.propTypes = {
@@ -34,7 +34,7 @@ Profile.propTypes = {
     login: PropTypes.string.isRequired,
     organizations: PropTypes.array.isRequired,
   }).isRequired,
-}
+};
 
 function ProfileStatsSection({user}) {
   return (
@@ -43,7 +43,7 @@ function ProfileStatsSection({user}) {
       <ProfileStat value={user.repositoriesCount} label="repositories" />
       <ProfileStat value={user.followingCount} label="following" />
     </Section>
-  )
+  );
 }
 
 ProfileStatsSection.propTypes = {
@@ -52,7 +52,7 @@ ProfileStatsSection.propTypes = {
     repositoriesCount: PropTypes.number,
     followingCount: PropTypes.number,
   }),
-}
+};
 
 function ProfileStat({value, label}) {
   return (
@@ -69,13 +69,13 @@ function ProfileStat({value, label}) {
         <small>{label}</small>
       </Text>
     </div>
-  )
+  );
 }
 
 ProfileStat.propTypes = {
   value: PropTypes.number,
   label: PropTypes.string,
-}
+};
 
 function OrganizationsSection({orgs}) {
   return (
@@ -96,7 +96,7 @@ function OrganizationsSection({orgs}) {
         </a>
       ))}
     </Section>
-  )
+  );
 }
 
 OrganizationsSection.propTypes = {
@@ -107,17 +107,17 @@ OrganizationsSection.propTypes = {
       login: PropTypes.string.isRequired,
     }),
   ),
-}
+};
 
 function ProfileUserConsumer() {
   return (
     <UserContext.Consumer>
       {user => <Profile user={user} />}
     </UserContext.Consumer>
-  )
+  );
 }
 
-export default ProfileUserConsumer
+export default ProfileUserConsumer;
 
 /*
 eslint
